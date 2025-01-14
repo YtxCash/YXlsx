@@ -34,7 +34,7 @@ QT_BEGIN_NAMESPACE_YXLSX
 
 class DocPropsCore final : public AbstractOOXmlFile {
 public:
-    explicit DocPropsCore(XmlMode mode);
+    explicit DocPropsCore(OperationMode mode);
 
     bool SetProperty(const QString& name, const QString& value);
     inline QString GetProperty(const QString& name) const { return property_hash_.value(name, QString()); }

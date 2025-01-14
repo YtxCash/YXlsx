@@ -32,7 +32,7 @@
 
 QT_BEGIN_NAMESPACE_YXLSX
 
-enum class XmlMode { kCreateNew, kLoadExisting };
+enum class OperationMode { kCreateNew, kLoadExisting };
 
 class AbstractOOXmlFile {
 public:
@@ -49,11 +49,11 @@ public:
     inline QString GetXmlPath() const { return xml_path_; }
 
 protected:
-    explicit AbstractOOXmlFile(XmlMode flag = XmlMode::kCreateNew);
+    explicit AbstractOOXmlFile(OperationMode mode = OperationMode::kCreateNew);
 
 protected:
     QSharedPointer<RelationshipMgr> relationship_ {};
-    XmlMode xml_mode_ {};
+    OperationMode operation_mode_ {};
     // such as "xl/worksheets/sheet1.xml"
     QString xml_path_ {};
 };

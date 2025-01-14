@@ -29,7 +29,7 @@
 
 QT_BEGIN_NAMESPACE_YXLSX
 
-ContentType::ContentType(XmlMode mode)
+ContentType::ContentType(OperationMode mode)
     : AbstractOOXmlFile { mode }
     , package_prefix_ { QStringLiteral("application/vnd.openxmlformats-package.") }
     , document_prefix_ { QStringLiteral("application/vnd.openxmlformats-officedocument.") }

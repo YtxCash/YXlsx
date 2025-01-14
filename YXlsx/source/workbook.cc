@@ -30,7 +30,7 @@
 
 QT_BEGIN_NAMESPACE_YXLSX
 
-Workbook::Workbook(XmlMode mode)
+Workbook::Workbook(OperationMode mode)
     : shared_string_ { QSharedPointer<SharedString>::create(mode) }
     , style_ { QSharedPointer<Style>::create(mode) }
     , x_window_ { 240 }

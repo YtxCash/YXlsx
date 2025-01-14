@@ -30,9 +30,9 @@
 
 QT_BEGIN_NAMESPACE_YXLSX
 
-AbstractOOXmlFile::AbstractOOXmlFile(XmlMode mode)
+AbstractOOXmlFile::AbstractOOXmlFile(OperationMode mode)
     : relationship_ { new RelationshipMgr }
-    , xml_mode_ { mode }
+    , operation_mode_ { mode }
 {
 }
 

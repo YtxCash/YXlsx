@@ -39,7 +39,7 @@ QT_BEGIN_NAMESPACE_YXLSX
 
 class SharedString final : public AbstractOOXmlFile {
 public:
-    explicit SharedString(XmlMode mode);
+    explicit SharedString(OperationMode mode);
 
     int SetSharedString(const QString& string, int row, int column);
     void IncrementReference(int index, int row, int column);

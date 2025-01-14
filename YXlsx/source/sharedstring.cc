@@ -30,7 +30,7 @@
 
 QT_BEGIN_NAMESPACE_YXLSX
 
-SharedString::SharedString(XmlMode mode)
+SharedString::SharedString(OperationMode mode)
     : AbstractOOXmlFile { mode }
 {
 }

@@ -40,24 +40,22 @@ public:
     void SetProperty(const QString& key, const QString& property);
 
     bool Save() const;
-    bool SaveAs(const QString& xlsx_name) const;
+    bool Save(const QString& xlsx_name) const;
 
-    bool IsLoadPackage() const { return is_load_; }
+    bool IsLoadXlsx() const { return is_load_xlsx_; }
     QSharedPointer<Workbook> GetWorkbook() const { return workbook_; }
     QStringList GetProperty() const { return document_property_hash_.keys(); }
 
 private:
-    explicit Document(QIODevice* device, QObject* parent = nullptr);
     void Init();
-    bool LoadPackage(QIODevice* device);
-    bool SavePackage(QIODevice* device) const;
-    bool SaveAs(QIODevice* device) const;
+    bool ParseXlsx(QIODevice* device);
+    bool ComposeXlsx(QIODevice* device) const;
 
 private:
-    bool is_load_ { false };
-    const QString kDefaultPackageName { QStringLiteral("Book1.xlsx") }; // default name when package name not specified
+    bool is_load_xlsx_ { false };
 
     QString xlsx_name_ {}; // name of the .xlsx file
+
     QHash<QString, QString> document_property_hash_ {}; // core, app and custom properties
     QSharedPointer<Workbook> workbook_ {};
     QSharedPointer<ContentType> content_type_ {};

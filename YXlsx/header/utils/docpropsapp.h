@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE_YXLSX
 
 class DocPropsApp final : public AbstractOOXmlFile {
 public:
-    explicit DocPropsApp(XmlMode mode);
+    explicit DocPropsApp(OperationMode mode);
 
     void ComposeXml(QIODevice* device) const override;
     bool ParseXml(QIODevice* device) override;

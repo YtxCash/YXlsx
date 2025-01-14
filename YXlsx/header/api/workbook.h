@@ -42,7 +42,7 @@ class Workbook final : public AbstractOOXmlFile {
     Q_DISABLE_COPY_MOVE(Workbook)
 
 public:
-    explicit Workbook(XmlMode mode);
+    explicit Workbook(OperationMode mode);
     ~Workbook();
 
     QSharedPointer<AbstractSheet> AppendSheet(const QString& name = QString(), SheetType type = SheetType::kWorkSheet);

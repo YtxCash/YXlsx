@@ -31,7 +31,7 @@ QT_BEGIN_NAMESPACE_YXLSX
 
 class Style final : public AbstractOOXmlFile {
 public:
-    explicit Style(XmlMode mode);
+    explicit Style(OperationMode mode);
     ~Style() = default;
 
     void ComposeXml(QIODevice* device) const override;

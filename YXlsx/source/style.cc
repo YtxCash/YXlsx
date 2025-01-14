@@ -29,7 +29,7 @@
 
 QT_BEGIN_NAMESPACE_YXLSX
 
-Style::Style(XmlMode mode)
+Style::Style(OperationMode mode)
     : AbstractOOXmlFile { mode }
 {
 }

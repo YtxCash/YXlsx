@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE_YXLSX
 
 class ContentType final : public AbstractOOXmlFile {
 public:
-    explicit ContentType(XmlMode mode);
+    explicit ContentType(OperationMode mode);
 
     void AddDefault(const QString& key, const QString& value);
     void AddOverride(const QString& key, const QString& value);

@@ -41,10 +41,10 @@ QT_BEGIN_NAMESPACE_YXLSX
 void Document::Init()
 {
     if (!content_type_)
-        content_type_ = QSharedPointer<ContentType>::create(XmlMode::kCreateNew);
+        content_type_ = QSharedPointer<ContentType>::create(OperationMode::kCreateNew);
 
     if (!workbook_)
-        workbook_ = QSharedPointer<Workbook>::create(XmlMode::kCreateNew);
+        workbook_ = QSharedPointer<Workbook>::create(OperationMode::kCreateNew);
 }
 
 // Explanation of the structure of an unzipped .xlsx file:
@@ -59,7 +59,7 @@ void Document::Init()
 //        * `xl/sharedStrings.xml`: Contains all shared strings to reduce redundancy.
 //        * `xl/styles.xml`: Defines cell styles, such as fonts, colors, and borders.
 // 3. By analyzing and parsing these files, the content of the `.xlsx` file can be extracted and manipulated efficiently.
-bool Document::LoadPackage(QIODevice* device)
+bool Document::ParseXlsx(QIODevice* device)
 {
     ZipReader zip_reader(device);
     const QStringList file_paths { zip_reader.GetFilePath() };
@@ -68,7 +68,7 @@ bool Document::LoadPackage(QIODevice* device)
     if (!file_paths.contains(QStringLiteral("[Content_Types].xml")))
         return false;
 
-    content_type_ = QSharedPointer<ContentType>::create(XmlMode::kLoadExisting);
+    content_type_ = QSharedPointer<ContentType>::create(OperationMode::kLoadExisting);
     content_type_->ParseByteArray(zip_reader.GetFileData(QStringLiteral("[Content_Types].xml")));
 
     // Load root rels file
@@ -84,7 +84,7 @@ bool Document::LoadPackage(QIODevice* device)
         // In normal case, this should be "docProps/core.xml"
         const QString doc_props_core_name { core_rels[0].target };
 
-        DocPropsCore props(XmlMode::kLoadExisting);
+        DocPropsCore props(OperationMode::kLoadExisting);
         props.ParseByteArray(zip_reader.GetFileData(doc_props_core_name));
         const auto prop_names { props.GetProperty() };
         for (const QString& name : prop_names)
@@ -98,7 +98,7 @@ bool Document::LoadPackage(QIODevice* device)
         // In normal case, this should be "docProps/app.xml"
         const QString doc_props_app_Name { rels_app[0].target };
 
-        DocPropsApp props(XmlMode::kLoadExisting);
+        DocPropsApp props(OperationMode::kLoadExisting);
         props.ParseByteArray(zip_reader.GetFileData(doc_props_app_Name));
         const auto prop_names { props.GetProperty() };
         for (const QString& name : prop_names)
@@ -107,7 +107,7 @@ bool Document::LoadPackage(QIODevice* device)
 
     // load workbook now, Get the workbook file path from the root rels file
     // In normal case, this should be "xl/workbook.xml"
-    workbook_ = QSharedPointer<Workbook>::create(XmlMode::kLoadExisting);
+    workbook_ = QSharedPointer<Workbook>::create(OperationMode::kLoadExisting);
     QList<Relationship> rels_xl { root_rels.GetDocumentRelationship(QStringLiteral("/officeDocument")) };
     if (rels_xl.isEmpty())
         return false;
@@ -130,7 +130,7 @@ bool Document::LoadPackage(QIODevice* device)
         // dev34
         const QString path { (workbook_dir == QStringLiteral(".")) ? name : workbook_dir + QStringLiteral("/") + name };
 
-        QSharedPointer<Style> styles { QSharedPointer<Style>::create(XmlMode::kLoadExisting) };
+        QSharedPointer<Style> styles { QSharedPointer<Style>::create(OperationMode::kLoadExisting) };
         styles->ParseByteArray(zip_reader.GetFileData(path));
         workbook_->GetStyle() = styles;
     }
@@ -156,11 +156,11 @@ bool Document::LoadPackage(QIODevice* device)
         sheet->ParseByteArray(zip_reader.GetFileData(sheet->GetXmlPath()));
     }
 
-    is_load_ = true;
+    is_load_xlsx_ = true;
     return true;
 }
 
-bool Document::SavePackage(QIODevice* device) const
+bool Document::ComposeXlsx(QIODevice* device) const
 {
     ZipWriter zip_writer(device);
     if (zip_writer.IsError())
@@ -168,8 +168,8 @@ bool Document::SavePackage(QIODevice* device) const
 
     content_type_->ClearOverride();
 
-    DocPropsApp doc_props_app(XmlMode::kCreateNew);
-    DocPropsCore doc_props_core(XmlMode::kCreateNew);
+    DocPropsApp doc_props_app(OperationMode::kCreateNew);
+    DocPropsCore doc_props_core(OperationMode::kCreateNew);
 
     // save worksheet xml files
     QList<QSharedPointer<AbstractSheet>> worksheets { workbook_->GetSheetByType(SheetType::kWorkSheet) };
@@ -260,29 +260,12 @@ Document::Document(const QString& xlsx_name, QObject* parent)
             return;
         }
 
-        if (!LoadPackage(&xlsx)) {
+        if (!ParseXlsx(&xlsx)) {
             qWarning() << "Failed to load the package for document:" << xlsx_name;
             return;
         }
     } else {
         qWarning() << "File does not exist, initializing a new document:" << xlsx_name;
-    }
-
-    Init();
-}
-
-/*!
- * \overload
- * Try to open an existing xlsx document from \a device.
- * The \a parent argument is passed to QObject's constructor.
- */
-Document::Document(QIODevice* device, QObject* parent)
-    : QObject { parent }
-{
-    if (device && device->isReadable()) {
-        if (!LoadPackage(device)) {
-            qWarning() << "Failed to load package from the provided device.";
-        }
     }
 
     Init();
@@ -327,13 +310,13 @@ void Document::SetProperty(const QString& key, const QString& property) { docume
  * the document constructed, a default name "book1.xlsx" will be used.
  * Returns true if saved successfully.
  */
-bool Document::Save() const { return SaveAs(xlsx_name_.isEmpty() ? kDefaultPackageName : xlsx_name_); }
+bool Document::Save() const { return Save(xlsx_name_.isEmpty() ? kDefaultXlsxName : xlsx_name_); }
 
 /*!
  * Saves the document to the file with the given \a name.
  * Returns true if saved successfully.
  */
-bool Document::SaveAs(const QString& xlsx_name) const
+bool Document::Save(const QString& xlsx_name) const
 {
     QFile file(xlsx_name);
     if (!file.open(QIODevice::WriteOnly)) {
@@ -341,15 +324,7 @@ bool Document::SaveAs(const QString& xlsx_name) const
         return false;
     }
 
-    return SaveAs(&file);
+    return ComposeXlsx(&file);
 }
-
-/*!
- * \overload
- * This function writes a document to the given \a device.
- *
- * \warning The \a device will be closed when this function returned.
- */
-bool Document::SaveAs(QIODevice* device) const { return SavePackage(device); }
 
 QT_END_NAMESPACE_YXLSX

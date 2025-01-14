@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     book1->GetCurrentWorksheet()->Write(1, 4, QDateTime::currentDateTime());
     book1->GetCurrentWorksheet()->Write("b1", 2);
 
-    if (!test1.SaveAs("Test1.xlsx")) {
+    if (!test1.Save("Test1.xlsx")) {
         qDebug() << "Failed to write xlsx file";
     }
 
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     yxlsx::Document test2("Test1.xlsx");
     auto book2 { test2.GetWorkbook() };
 
-    if (test2.IsLoadPackage()) {
+    if (test2.IsLoadXlsx()) {
         auto value { book2->GetCurrentWorksheet()->Read(1, 1) };
         qDebug() << "Cell(1,1) is " << value;
 

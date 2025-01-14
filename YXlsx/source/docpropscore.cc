@@ -40,7 +40,7 @@ inline const QLatin1String kW3SchemaInstance("http://www.w3.org/2001/XMLSchema-i
 const QHash<QString, QString> DocPropsCore::kElementNamespaceHash { { QStringLiteral("creator"), kPLElements },
     { QStringLiteral("lastModifiedBy"), kCorePropertyies }, { QStringLiteral("created"), kPLTerms }, { QStringLiteral("modified"), kPLTerms } };
 
-DocPropsCore::DocPropsCore(XmlMode mode)
+DocPropsCore::DocPropsCore(OperationMode mode)
     : AbstractOOXmlFile { mode }
 {
 }

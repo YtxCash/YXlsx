@@ -31,7 +31,7 @@
 
 QT_BEGIN_NAMESPACE_YXLSX
 
-DocPropsApp::DocPropsApp(XmlMode mode)
+DocPropsApp::DocPropsApp(OperationMode mode)
     : AbstractOOXmlFile { mode }
 {
 }
